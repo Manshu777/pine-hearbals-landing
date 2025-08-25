@@ -20,6 +20,9 @@ class ProductCategoryForm
                 Textarea::make('description')
                     ->columnSpanFull(),
                 FileUpload::make('image')
+                    ->disk('public')
+              ->directory('category-img')
+
                     ->image(),
             ]);
     }

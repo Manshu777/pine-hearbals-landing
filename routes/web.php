@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\BlogController;
 
 Route::get('/', function () {
     return view('home.index');
@@ -17,3 +18,12 @@ Route::get('/categories', [App\Http\Controllers\ProductCategoryController::class
 Route::get('/categories/{slug}', [App\Http\Controllers\ProductCategoryController::class, 'show'])->name('category.show');
 Route::get('/products', [App\Http\Controllers\ProductController::class, 'index'])->name('products');
 Route::get('/products/{slug}', [App\Http\Controllers\ProductController::class, 'show'])->name('product.show');
+Route::get('/records/{record}/preview', function (\App\Models\Record $record) {
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.record', [
+        'record' => $record,
+    ]);
+    return $pdf->stream("record_{$record->id}.pdf");
+})->name('records.preview');
+
+
+Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');

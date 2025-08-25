@@ -20,6 +20,9 @@ class AwardForm
                 Textarea::make('description')
                     ->columnSpanFull(),
                 FileUpload::make('image')
+                          ->disk('public')
+                    ->directory('blog-img')
+
                     ->image(),
             ]);
     }

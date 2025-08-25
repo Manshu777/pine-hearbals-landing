@@ -1,21 +1,17 @@
-@section('content')
 
- 
+@php
+    $slides = App\Models\Slide::all();
+@endphp
+
 <div class="relative w-full mx-auto overflow-hidden">
     <!-- Slider container -->
     <div id="slider" class="flex transition-transform duration-500 ease-in-out">
-        @php
-            $slides = [
-                ['image' => 'https://plus.unsplash.com/premium_photo-1676496046182-356a6a0ed002?q=80&w=2076&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 'alt' => 'Nature Landscape', 'caption' => 'Explore the Beauty of Nature'],
-                ['image' => 'https://images.unsplash.com/photo-1434725039720-aaad6dd32dfe?q=80&w=2242&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 'alt' => 'Technology Innovation', 'caption' => 'Innovate with Cutting-Edge Technology'],
-                ['image' => 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 'alt' => 'Business Growth', 'caption' => 'Grow Your Business with Us'],
-                ['image' => 'https://images.unsplash.com/photo-1433838552652-f9a46b332c40?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 'alt' => 'Travel Adventure', 'caption' => 'Embark on New Adventures'],
-            ];
-        @endphp
         @foreach ($slides as $index => $slide)
             <div class="w-full flex-shrink-0 relative">
-                <img src="{{ $slide['image'] }}" alt="{{ $slide['alt'] }}" class="w-full h-84 sm:h-80 md:h-[550px] object-cover">
-                
+                <img src="{{ Storage::url($slide->image) }}" alt="{{ $slide->alt }}" class="w-full h-84 sm:h-80 md:h-[550px] object-cover">
+                <div class="absolute bottom-4 left-0 right-0 text-center text-white text-lg font-semibold">
+                    {{ $slide->caption }}
+                </div>
             </div>
         @endforeach
     </div>
@@ -38,5 +34,43 @@
     </div>
 </div>
 
+@section('scripts')
+    <script>
+        const slider = document.getElementById('slider');
+        const prevSlide = document.getElementById('prev-slide');
+        const nextSlide = document.getElementById('next-slide');
+        const dots = document.querySelectorAll('.slide-dot');
+        let currentIndex = 0;
 
+        function updateSlider() {
+            slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('bg-green-600', index === currentIndex);
+                dot.classList.toggle('bg-green-200', index !== currentIndex);
+            });
+        }
+
+        prevSlide.addEventListener('click', () => {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : {{ $slides->count() - 1 }};
+            updateSlider();
+        });
+
+        nextSlide.addEventListener('click', () => {
+            currentIndex = (currentIndex < {{ $slides->count() - 1 }}) ? currentIndex + 1 : 0;
+            updateSlider();
+        });
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                currentIndex = parseInt(dot.dataset.index);
+                updateSlider();
+            });
+        });
+
+        // Auto-slide (optional)
+        setInterval(() => {
+            currentIndex = (currentIndex < {{ $slides->count() - 1 }}) ? currentIndex + 1 : 0;
+            updateSlider();
+        }, 5000);
+    </script>
 @endsection
